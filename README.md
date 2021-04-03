@@ -3,9 +3,9 @@
 
 ### Installation
 1. clone this project
- 
-   
-   
+
+
+
 ```
 $ git clone git@github.com:ErwinLee10/bigdata-kafka.git
 ```
@@ -25,7 +25,7 @@ $ ../bin/kafka-server-start.sh ../config/server.properties
 4. **open a new terminal** and run the kafka connect cluster
 ```sh
 $ cd bigdata-kafka/setup
-$ .../bin/connect-distributed.sh ../config/connect-distributed.properties 
+$ .../bin/connect-distributed.sh ../config/connect-distributed.properties
 ```
 5. **open a new terminal** and submit the kafka connect twitter source jobs
 ```sh
@@ -94,3 +94,35 @@ hdfs dfs -ls /
 
 4. the data from kafka is stored in the /topics folder
 
+
+
+
+------------------------------------------------
+
+#### setting up HDFS sink connector
+
+1. submit this configuration. Do not forget to change the topic name, aws credentials and bucket names
+
+```
+curl -X POST \
+   localhost:8084/connectors \
+  -H 'Content-Type: application/json' \
+  -H 'Accept: application/json' \
+  -d '{
+  "name": "S3SinkConnector",
+  "config": {
+   "connector.class": "io.confluent.connect.s3.S3SinkConnector",
+  "s3.region": "ap-southeast-1",
+  "flush.size": "1000",
+  "topics": "twitter.raw",
+  "tasks.max": "1",
+  "aws.secret.access.key": "",
+  "format.class": "io.confluent.connect.s3.format.json.JsonFormat",
+  "aws.access.key.id": "",
+  "value.converter": "org.apache.kafka.connect.json.JsonConverter",
+  "storage.class": "io.confluent.connect.s3.storage.S3Storage",
+  "s3.bucket.name": "bucket name",
+  "key.converter": "org.apache.kafka.connect.storage.StringConverter"
+  }
+}'
+```
